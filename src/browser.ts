@@ -84,7 +84,7 @@ class Logger {
       if (this.level < minLevel) return
       const output: string[] = []
       if (Logger.showTime) {
-        output.push(Time.template(Logger.showTime))
+        output.push(Logger.color(8, Time.template(Logger.showTime)))
       }
       output.push(prefix + this.displayName, ...args)
       if (Logger.showDiff) {

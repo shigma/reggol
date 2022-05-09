@@ -102,7 +102,7 @@ class Logger {
         let indent = 4, output = ''
         if (target.showTime) {
           indent += target.showTime.length + 1
-          output += Time.template(target.showTime + ' ')
+          output += Logger.color(target, 8, Time.template(target.showTime)) + ' '
         }
         output += prefix + this.color(target, this.name, ';1') + ' ' + this.format(target, indent, ...args)
         if (target.showDiff) {
