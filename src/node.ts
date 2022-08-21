@@ -42,7 +42,6 @@ class Logger {
 
   // global config
   static timestamp = 0
-  static colors = stderr ? stderr.has256 ? c256 : c16 : []
   static instances: Record<string, Logger> = {}
 
   static targets: Logger.Target[] = [{
@@ -53,7 +52,7 @@ class Logger {
   }]
 
   static formatters: Record<string, (value: any, target: Logger.Target, logger: Logger) => string> = {
-    c: (value, target, logger) => Logger.color(target, logger.code, value),
+    c: (value, target, logger) => Logger.color(target, Logger.code(logger.name, target), value),
     C: (value, target) => Logger.color(target, 15, value, ';1'),
     o: (value, target) => inspect(value, { colors: !!target.colors }).replace(/\s*\n\s*/g, ' '),
   }
@@ -67,22 +66,20 @@ class Logger {
     return `\u001b[3${code < 8 ? code : '8;5;' + code}${target.colors >= 2 ? decoration : ''}m${value}\u001b[0m`
   }
 
-  static code(name: string) {
+  static code(name: string, target: Logger.Target) {
     let hash = 0
     for (let i = 0; i < name.length; i++) {
       hash = ((hash << 3) - hash) + name.charCodeAt(i)
       hash |= 0
     }
-    return Logger.colors[Math.abs(hash) % Logger.colors.length]
+    const colors = target.colors >= 2 ? c256 : target.colors >= 1 ? c16 : []
+    return colors[Math.abs(hash) % colors.length]
   }
-
-  private code: number
 
   constructor(public name: string) {
     if (name in Logger.instances) return Logger.instances[name]
 
     Logger.instances[name] = this
-    this.code = Logger.code(name)
     this.createMethod('success', '[S] ', Logger.SUCCESS)
     this.createMethod('error', '[E] ', Logger.ERROR)
     this.createMethod('info', '[I] ', Logger.INFO)
@@ -116,7 +113,8 @@ class Logger {
   }
 
   private color(target: Logger.Target, value: any, decoration = '') {
-    return Logger.color(target, this.code, value, decoration)
+    const code = Logger.code(this.name, target)
+    return Logger.color(target, code, value, decoration)
   }
 
   private format(target: Logger.Target, indent: number, ...args: any[]) {
