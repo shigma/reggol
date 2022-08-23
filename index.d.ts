@@ -1,4 +1,4 @@
-namespace Logger {
+declare namespace Logger {
   export interface LevelConfig {
     base: number
     [K: string]: Level
@@ -23,7 +23,7 @@ namespace Logger {
   }
 }
 
-interface Logger extends Record<Logger.Type, Logger.Function> {}
+declare interface Logger extends Record<Logger.Type, Logger.Function> {}
 
 declare class Logger {
   // log levels

@@ -1,12 +1,18 @@
 {
   "name": "reggol",
   "description": "Logger for professionals",
-  "version": "1.0.4",
-  "main": "lib/node.js",
-  "browser": "lib/browser.js",
+  "version": "1.1.0",
+  "main": "lib/node.cjs",
   "typings": "index.d.ts",
+  "exports": {
+    ".": {
+      "node": "./lib/node.cjs",
+      "browser": "./lib/browser.mjs"
+    },
+    "./package.json": "./package.json"
+  },
   "files": [
-    "lib/*.js",
+    "lib",
     "index.d.ts"
   ],
   "repository": {
@@ -20,7 +26,9 @@
   "author": "Shigma <shigma10826@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "tsc -b",
+    "build:node": "esbuild src/node.ts --outfile=lib/node.cjs --bundle --sourcemap --platform=node --external:cosmokit --external:supports-color --target=es2019",
+    "build:browser": "esbuild src/browser.ts --outfile=lib/browser.mjs --bundle --sourcemap --platform=neutral --external:cosmokit --external:supports-color --target=esnext",
+    "build": "yarn build:node && yarn build:browser && yarn tsc -b",
     "test": "mocha -r esbuild-register tests/*.spec.ts",
     "test:text": "shx rm -rf coverage && c8 -r text yarn test",
     "test:json": "shx rm -rf coverage && c8 -r json yarn test",
