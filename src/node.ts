@@ -1,5 +1,5 @@
 import { format, inspect } from 'util'
-import { stderr } from 'supports-color'
+import { stdout } from 'supports-color'
 import { Time } from 'cosmokit'
 
 const c16 = [6, 2, 3, 4, 5, 1]
@@ -25,11 +25,13 @@ namespace Logger {
     colors?: number
     showDiff?: boolean
     showTime?: string
+    space?: number
+    padStart?: number
     print(text: string): void
   }
 }
 
-interface Logger extends Record<Logger.Type, Logger.Function> {}
+interface Logger extends Record<Logger.Type, Logger.Function> { }
 
 class Logger {
   // log levels
@@ -45,9 +47,9 @@ class Logger {
   static instances: Record<string, Logger> = {}
 
   static targets: Logger.Target[] = [{
-    colors: stderr && stderr.level,
+    colors: stdout && stdout.level,
     print(text: string) {
-      process.stderr.write(text + '\n')
+      process.stdout.write(text + '\n')
     },
   }]
 
@@ -80,11 +82,11 @@ class Logger {
     if (name in Logger.instances) return Logger.instances[name]
 
     Logger.instances[name] = this
-    this.createMethod('success', '[S] ', Logger.SUCCESS)
-    this.createMethod('error', '[E] ', Logger.ERROR)
-    this.createMethod('info', '[I] ', Logger.INFO)
-    this.createMethod('warn', '[W] ', Logger.WARN)
-    this.createMethod('debug', '[D] ', Logger.DEBUG)
+    this.createMethod('success', '[S]', Logger.SUCCESS)
+    this.createMethod('error', '[E]', Logger.ERROR)
+    this.createMethod('info', '[I]', Logger.INFO)
+    this.createMethod('warn', '[W]', Logger.WARN)
+    this.createMethod('debug', '[D]', Logger.DEBUG)
   }
 
   extend = (namespace: string) => {
@@ -96,12 +98,21 @@ class Logger {
       if (this.level < minLevel) return
       const now = Date.now()
       for (const target of Logger.targets) {
-        let indent = 4, output = ''
+        const delim = ' '.repeat(target.space || 1);
+        let indent = 4 + 2 * delim.length, output = ''
         if (target.showTime) {
-          indent += target.showTime.length + 1
-          output += Logger.color(target, 8, Time.template(target.showTime)) + ' '
+          indent += target.showTime.length + delim.length
+          output += Logger.color(target, 8, Time.template(target.showTime)) + delim
         }
-        output += prefix + this.color(target, this.name, ';1') + ' ' + this.format(target, indent, ...args)
+        if (target.padStart) {
+          indent += delim.length + target.padStart
+          output += this.color(target, this.name.padStart(target.padStart), ';1') + delim;
+        }
+        output += prefix + delim;
+        if (!target.padStart) {
+          output += this.color(target, this.name, ';1') + delim
+        }
+        output += this.format(target, indent, ...args)
         if (target.showDiff) {
           const diff = Logger.timestamp && now - Logger.timestamp
           output += this.color(target, ' +' + Time.format(diff))
