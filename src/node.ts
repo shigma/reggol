@@ -1,5 +1,5 @@
 import { format, inspect } from 'util'
-import { stderr } from 'supports-color'
+import { stdout } from 'supports-color'
 import { Time } from 'cosmokit'
 
 const c16 = [6, 2, 3, 4, 5, 1]
@@ -45,9 +45,9 @@ class Logger {
   static instances: Record<string, Logger> = {}
 
   static targets: Logger.Target[] = [{
-    colors: stderr && stderr.level,
+    colors: stdout && stdout.level,
     print(text: string) {
-      process.stderr.write(text + '\n')
+      process.stdout.write(text + '\n')
     },
   }]
 
