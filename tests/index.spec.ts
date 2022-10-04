@@ -40,15 +40,6 @@ describe('Logger API', () => {
     expect(data).to.equal('[E] test:logger message +0ms\n')
   })
 
-  it('format style', () => {
-    Logger.padStart = 15
-    Logger.space = 2
-    logger.success('test')
-    expect(data).to.equal("    test:logger  [S]  test  +0ms")
-    Logger.padStart = 0
-    Logger.space = 1
-  })
-
   it('format object', () => {
     clock.tick(2)
     const object = { foo: 'bar' }
@@ -74,5 +65,18 @@ describe('Logger API', () => {
     logger.level = Logger.DEBUG
     logger.debug('%c', 'foo bar')
     expect(data).to.be.ok
+  })
+
+  it('custom style', () => {
+    let data = '';
+    Logger.targets.push({
+      padStart: 15,
+      space: 2,
+      print(text) {
+        data += text + '\n'
+      },
+    })
+    logger.success('test')
+    expect(data).to.equal("    test:logger  [S]  test")
   })
 })

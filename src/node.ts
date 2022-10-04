@@ -98,7 +98,7 @@ class Logger {
       if (this.level < minLevel) return
       const now = Date.now()
       for (const target of Logger.targets) {
-        const delim = ' '.repeat(target.space || 1);
+        const delim = ' '.repeat(target.space || 1)
         let indent = 4 + 2 * delim.length, output = ''
         if (target.showTime) {
           indent += target.showTime.length + delim.length
@@ -106,9 +106,9 @@ class Logger {
         }
         if (target.padStart) {
           indent += delim.length + target.padStart
-          output += this.color(target, this.name.padStart(target.padStart), ';1') + delim;
+          output += this.color(target, this.name.padStart(target.padStart), ';1') + delim
         }
-        output += prefix + delim;
+        output += prefix + delim
         if (!target.padStart) {
           output += this.color(target, this.name, ';1') + delim
         }
