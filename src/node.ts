@@ -110,11 +110,12 @@ class Logger {
           output += Logger.color(target, 8, Time.template(target.showTime)) + space
         }
         const label = this.color(target, this.name, ';1')
+        const padLength = (target.label?.width ?? 0) + label.length - this.name.length
         if (target.label?.align === 'right') {
-          output += label.padStart(target.label.width) + space + prefix + space
-          indent += target.label.width + space.length
+          output += label.padStart(padLength) + space + prefix + space
+          indent += (target.label.width ?? 0) + space.length
         } else {
-          output += prefix + space + label.padEnd(target.label?.width ?? 0) + space
+          output += prefix + space + label.padEnd(padLength) + space
         }
         output += this.format(target, indent, ...args)
         if (target.showDiff) {

@@ -1,7 +1,7 @@
 {
   "name": "reggol",
   "description": "Logger for professionals",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "main": "lib/node.cjs",
   "typings": "index.d.ts",
   "exports": {

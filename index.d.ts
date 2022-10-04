@@ -9,6 +9,12 @@ declare namespace Logger {
   export type Type = 'success' | 'error' | 'info' | 'warn' | 'debug'
   export type Formatter = (this: Logger, value: any) => string
 
+  export interface LabelStyle {
+    width?: number
+    margin?: number
+    align?: 'left' | 'right'
+  }
+
   export interface Target {
     /**
      * - 0: no color support
@@ -19,6 +25,7 @@ declare namespace Logger {
     colors?: number
     showDiff?: boolean
     showTime?: string
+    label?: LabelStyle
     print(text: string): void
   }
 }
