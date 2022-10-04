@@ -115,7 +115,7 @@ class Logger {
         output += this.format(target, indent, ...args)
         if (target.showDiff) {
           const diff = Logger.timestamp && now - Logger.timestamp
-          output += this.color(target, ' +' + Time.format(diff))
+          output += this.color(target, delim + '+' + Time.format(diff))
         }
         target.print(output)
       }
