@@ -77,6 +77,6 @@ describe('Logger API', () => {
       },
     })
     logger.success('test')
-    expect(data).to.equal("    test:logger  [S]  test")
+    expect(data).to.equal("    test:logger  [S]  test\n")
   })
 })
