@@ -31,27 +31,28 @@ describe('Logger API', () => {
     logger = new Logger('test').extend('logger')
     expect(logger.name).to.equal('test:logger')
     expect(logger).to.equal(new Logger('test:logger'))
+    logger = new Logger('test')
   })
 
   it('format error', () => {
     const error = new Error('message')
-    error.stack = null
+    error.stack = undefined
     logger.error(error)
-    expect(data).to.equal('[E] test:logger message +0ms\n')
+    expect(data).to.equal('[E] test message +0ms\n')
   })
 
   it('format object', () => {
     clock.tick(2)
     const object = { foo: 'bar' }
     logger.success(object)
-    expect(data).to.equal("[S] test:logger { foo: 'bar' } +2ms\n")
+    expect(data).to.equal("[S] test { foo: 'bar' } +2ms\n")
   })
 
   it('custom formatter', () => {
     clock.tick(1)
     Logger.formatters.x = () => 'custom'
     logger.info('%x%%x')
-    expect(data).to.equal('[I] test:logger custom%x +1ms\n')
+    expect(data).to.equal('[I] test custom%x +1ms\n')
   })
 
   it('log levels', () => {
@@ -65,5 +66,14 @@ describe('Logger API', () => {
     logger.level = Logger.DEBUG
     logger.debug('%c', 'foo bar')
     expect(data).to.be.ok
+  })
+
+  it('label style', () => {
+    Logger.targets[1].label = { align: 'right', width: 10, margin: 2 }
+    logger.info('message\nmessage')
+    expect(data).to.equal([
+      '      test  [I]  message\n',
+      '                 message +0ms\n',
+    ].join(''))
   })
 })

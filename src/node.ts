@@ -21,10 +21,17 @@ namespace Logger {
   export type Function = (format: any, ...param: any[]) => void
   export type Type = 'success' | 'error' | 'info' | 'warn' | 'debug'
 
+  export interface LabelStyle {
+    width?: number
+    margin?: number
+    align?: 'left' | 'right'
+  }
+
   export interface Target {
     colors?: number
     showDiff?: boolean
     showTime?: string
+    label?: LabelStyle
     print(text: string): void
   }
 }
@@ -80,11 +87,11 @@ class Logger {
     if (name in Logger.instances) return Logger.instances[name]
 
     Logger.instances[name] = this
-    this.createMethod('success', '[S] ', Logger.SUCCESS)
-    this.createMethod('error', '[E] ', Logger.ERROR)
-    this.createMethod('info', '[I] ', Logger.INFO)
-    this.createMethod('warn', '[W] ', Logger.WARN)
-    this.createMethod('debug', '[D] ', Logger.DEBUG)
+    this.createMethod('success', '[S]', Logger.SUCCESS)
+    this.createMethod('error', '[E]', Logger.ERROR)
+    this.createMethod('info', '[I]', Logger.INFO)
+    this.createMethod('warn', '[W]', Logger.WARN)
+    this.createMethod('debug', '[D]', Logger.DEBUG)
   }
 
   extend = (namespace: string) => {
@@ -96,12 +103,20 @@ class Logger {
       if (this.level < minLevel) return
       const now = Date.now()
       for (const target of Logger.targets) {
-        let indent = 4, output = ''
+        const space = ' '.repeat(target.label?.margin ?? 1)
+        let indent = 3 + space.length, output = ''
         if (target.showTime) {
-          indent += target.showTime.length + 1
-          output += Logger.color(target, 8, Time.template(target.showTime)) + ' '
+          indent += target.showTime.length + space.length
+          output += Logger.color(target, 8, Time.template(target.showTime)) + space
         }
-        output += prefix + this.color(target, this.name, ';1') + ' ' + this.format(target, indent, ...args)
+        const label = this.color(target, this.name, ';1')
+        if (target.label?.align === 'right') {
+          output += label.padStart(target.label.width) + space + prefix + space
+          indent += target.label.width + space.length
+        } else {
+          output += prefix + space + label.padEnd(target.label?.width ?? 0) + space
+        }
+        output += this.format(target, indent, ...args)
         if (target.showDiff) {
           const diff = Logger.timestamp && now - Logger.timestamp
           output += this.color(target, ' +' + Time.format(diff))
