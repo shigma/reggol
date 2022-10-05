@@ -1,13 +1,18 @@
 {
   "name": "reggol",
   "description": "Logger for professionals",
-  "version": "1.2.2",
-  "main": "lib/node.cjs",
+  "version": "1.3.0",
+  "sideEffects": false,
+  "main": "lib/node.js",
   "typings": "index.d.ts",
   "exports": {
     ".": {
-      "node": "./lib/node.cjs",
+      "node": "./lib/node.js",
       "browser": "./lib/browser.mjs"
+    },
+    "./shared": {
+      "require": "./lib/shared.js",
+      "import": "./lib/shared.mjs"
     },
     "./package.json": "./package.json"
   },
@@ -39,6 +44,7 @@
     "@types/chai": "^4.3.1",
     "@types/mocha": "^9.1.1",
     "@types/node": "^18.6.4",
+    "@types/object-inspect": "^1.8.1",
     "@types/supports-color": "^8.1.1",
     "@types/sinonjs__fake-timers": "^6.0.4",
     "c8": "^7.12.0",
@@ -47,10 +53,11 @@
     "esbuild-register": "^3.3.3",
     "mocha": "^9.2.2",
     "shx": "^0.3.4",
-    "typescript": "^4.7.4"
+    "typescript": "4.8.2"
   },
   "dependencies": {
     "supports-color": "^8.1.1",
-    "cosmokit": "^1.3.3"
+    "cosmokit": "^1.3.3",
+    "object-inspect": "^1.12.2"
   }
 }
