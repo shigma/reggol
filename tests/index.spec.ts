@@ -35,9 +35,11 @@ describe('Logger API', () => {
   })
 
   it('format error', () => {
-    const error = new Error('message')
-    error.stack = undefined
-    logger.error(error)
+    const inner = new Error('message')
+    inner.stack = undefined
+    const outer = new Error('outer')
+    outer['errors'] = [inner]
+    logger.error(outer)
     expect(data).to.equal('[E] test message +0ms\n')
   })
 

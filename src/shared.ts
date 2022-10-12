@@ -10,6 +10,10 @@ const c256 = [
   201, 202, 203, 204, 205, 206, 207, 208, 209, 214, 215, 220, 221,
 ]
 
+function isAggregateError(error: any): error is Error & { errors: Error[] } {
+  return error instanceof Error && Array.isArray((error as any)['errors'])
+}
+
 namespace Logger {
   export interface LevelConfig {
     base: number
@@ -106,6 +110,11 @@ class Logger {
 
   createMethod(name: Logger.Type, prefix: string, minLevel: number) {
     this[name] = (...args) => {
+      if (args.length === 1 && isAggregateError(args[0])) {
+        args[0].errors.forEach(error => this[name](error))
+        return
+      }
+
       if (this.level < minLevel) return
       const now = Date.now()
       for (const target of Logger.targets) {
@@ -142,6 +151,7 @@ class Logger {
   private format(target: Logger.Target, indent: number, ...args: any[]) {
     if (args[0] instanceof Error) {
       args[0] = args[0].stack || args[0].message
+      args.unshift('%s')
     } else if (typeof args[0] !== 'string') {
       args.unshift('%o')
     }
