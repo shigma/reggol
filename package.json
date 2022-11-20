@@ -33,7 +33,7 @@
   "license": "MIT",
   "scripts": {
     "build:node": "esbuild src/node.ts --outfile=lib/node.cjs --bundle --sourcemap --platform=node --external:cosmokit --external:supports-color --target=es2019",
-    "build:browser": "esbuild src/browser.ts --outfile=lib/browser.mjs --bundle --sourcemap --platform=neutral --external:cosmokit --target=esnext",
+    "build:browser": "esbuild src/browser.ts --outfile=lib/browser.mjs --bundle --sourcemap --platform=neutral --external:cosmokit --external:supports-color --target=esnext",
     "build:deno": "esbuild src/deno.ts --outfile=lib/deno.mjs --bundle --sourcemap --platform=neutral --external:cosmokit --target=esnext",
     "build": "yarn build:node && yarn build:browser && yarn build:deno && yarn tsc -b",
     "test": "mocha -r esbuild-register tests/*.spec.ts",
