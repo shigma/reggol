@@ -7,8 +7,9 @@
   "typings": "index.d.ts",
   "exports": {
     ".": {
-      "node": "./lib/node.js",
-      "browser": "./lib/browser.mjs"
+      "node": "./lib/node.cjs",
+      "browser": "./lib/browser.mjs",
+      "deno": "./lib/deno.mjs"
     },
     "./shared": {
       "require": "./lib/shared.js",
