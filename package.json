@@ -32,28 +32,32 @@
   "license": "MIT",
   "scripts": {
     "build:node": "esbuild src/node.ts --outfile=lib/node.cjs --bundle --sourcemap --platform=node --external:cosmokit --external:supports-color --target=es2019",
-    "build:browser": "esbuild src/browser.ts --outfile=lib/browser.mjs --bundle --sourcemap --platform=neutral --external:cosmokit --external:supports-color --target=esnext",
-    "build": "yarn build:node && yarn build:browser && yarn tsc -b",
+    "build:browser": "esbuild src/browser.ts --outfile=lib/browser.mjs --bundle --sourcemap --platform=neutral --external:cosmokit --external:util --target=esnext",
+    "build:deno": "esbuild src/deno.ts --outfile=lib/deno.mjs --bundle --sourcemap --platform=neutral --external:cosmokit --target=esnext",
+    "build": "yarn build:node && yarn build:browser && yarn build:deno && yarn tsc -b",
     "test": "mocha -r esbuild-register tests/*.spec.ts",
     "test:text": "shx rm -rf coverage && c8 -r text yarn test",
     "test:json": "shx rm -rf coverage && c8 -r json yarn test",
-    "test:html": "shx rm -rf coverage && c8 -r html yarn test"
+    "test:html": "shx rm -rf coverage && c8 -r html yarn test",
+    "dep": "yakumo upgrade"
   },
   "devDependencies": {
     "@sinonjs/fake-timers": "^6.0.1",
-    "@types/chai": "^4.3.1",
+    "@types/chai": "^4.3.4",
     "@types/mocha": "^9.1.1",
-    "@types/node": "^18.6.4",
+    "@types/node": "^18.11.9",
     "@types/object-inspect": "^1.8.1",
     "@types/supports-color": "^8.1.1",
     "@types/sinonjs__fake-timers": "^6.0.4",
     "c8": "^7.12.0",
-    "chai": "^4.3.6",
-    "esbuild": "^0.14.51",
-    "esbuild-register": "^3.3.3",
+    "chai": "^4.3.7",
+    "esbuild": "^0.14.54",
+    "esbuild-register": "^3.4.1",
     "mocha": "^9.2.2",
     "shx": "^0.3.4",
-    "typescript": "4.8.2"
+    "typescript": "4.8.2",
+    "yakumo": "^0.3.6",
+    "yakumo-upgrade": "^0.3.2"
   },
   "dependencies": {
     "supports-color": "^8.1.1",

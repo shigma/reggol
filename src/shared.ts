@@ -1,4 +1,3 @@
-import { stdout } from 'supports-color'
 import { Time } from 'cosmokit'
 
 const c16 = [6, 2, 3, 4, 5, 1]
@@ -46,7 +45,7 @@ namespace Logger {
   }
 }
 
-interface Logger extends Record<Logger.Type, Logger.Function> {}
+interface Logger extends Record<Logger.Type, Logger.Function> { }
 
 class Logger {
   // log levels
@@ -60,7 +59,7 @@ class Logger {
   // global config
   static timestamp = 0
   static targets: Logger.Target[] = [{
-    colors: stdout && stdout.level,
+    colors: 0,
     print(text: string) {
       console.log(text)
     },
