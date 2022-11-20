@@ -45,7 +45,7 @@ namespace Logger {
   }
 }
 
-interface Logger extends Record<Logger.Type, Logger.Function> { }
+interface Logger extends Record<Logger.Type, Logger.Function> {}
 
 class Logger {
   // log levels
