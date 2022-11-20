@@ -59,7 +59,7 @@ class Logger {
   // global config
   static timestamp = 0
   static targets: Logger.Target[] = [{
-    colors: 0,
+    colors: 3,
     print(text: string) {
       console.log(text)
     },
