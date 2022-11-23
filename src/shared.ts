@@ -42,6 +42,7 @@ namespace Logger {
     showDiff?: boolean
     showTime?: string
     label?: LabelStyle
+    maxLength?: number
     print(text: string): void
   }
 }
@@ -136,6 +137,10 @@ class Logger {
         if (target.showDiff) {
           const diff = Logger.timestamp && now - Logger.timestamp
           output += this.color(target, ' +' + Time.format(diff))
+        }
+        const { maxLength = 1024 } = target
+        if (output.length > maxLength) {
+          output = output.slice(0, maxLength) + '...'
         }
         target.print(output)
       }
