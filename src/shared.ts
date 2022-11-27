@@ -1,4 +1,5 @@
 import { Time } from 'cosmokit'
+import { getColorSupport } from 'spcolor'
 
 const c16 = [6, 2, 3, 4, 5, 1]
 const c256 = [
@@ -59,7 +60,7 @@ class Logger {
   // global config
   static timestamp = 0
   static targets: Logger.Target[] = [{
-    colors: 3,
+    colors: getColorSupport().level,
     print(text: string) {
       console.log(text)
     },
