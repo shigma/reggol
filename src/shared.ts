@@ -1,4 +1,4 @@
-import { stdout } from 'supports-color'
+import supportsColor from 'supports-color'
 import { Time } from 'cosmokit'
 
 const c16 = [6, 2, 3, 4, 5, 1]
@@ -61,7 +61,7 @@ class Logger {
   // global config
   static timestamp = 0
   static targets: Logger.Target[] = [{
-    colors: stdout && stdout.level,
+    colors: supportsColor.stdout && supportsColor.stdout.level,
     print(text: string) {
       console.log(text)
     },
