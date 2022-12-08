@@ -1,4 +1,4 @@
-import supportsColor from 'supports-color'
+import supportsColor from 'copy-supports-color'
 import { Time } from 'cosmokit'
 
 const c16 = [6, 2, 3, 4, 5, 1]
