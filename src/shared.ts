@@ -22,7 +22,7 @@ namespace Logger {
 
   export type Level = number | LevelConfig
   export type Function = (format: any, ...param: any[]) => void
-  export type Type = 'success' | 'error' | 'info' | 'warn' | 'debug'
+  export type Type = 'success' | 'error' | 'info' | 'warn' | 'warning' | 'debug'
   export type Formatter = (value: any, target: Logger.Target, logger: Logger) => any
 
   export interface LabelStyle {
@@ -102,6 +102,7 @@ class Logger {
     this.createMethod('error', '[E]', Logger.ERROR)
     this.createMethod('info', '[I]', Logger.INFO)
     this.createMethod('warn', '[W]', Logger.WARN)
+    this.createMethod('warning', '[W]', Logger.WARN)
     this.createMethod('debug', '[D]', Logger.DEBUG)
   }
 
