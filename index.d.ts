@@ -15,6 +15,15 @@ declare namespace Logger {
     align?: 'left' | 'right'
   }
 
+  export interface Record {
+    id: number
+    name: string
+    type: Logger.Type
+    level: number
+    content: string
+    timestamp: number
+  }
+
   export interface Target {
     /**
      * - 0: no color support
@@ -26,7 +35,8 @@ declare namespace Logger {
     showDiff?: boolean
     showTime?: string
     label?: LabelStyle
-    print(text: string): void
+    record?(record: Record): void
+    print?(text: string): void
   }
 }
 

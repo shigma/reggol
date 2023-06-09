@@ -31,6 +31,15 @@ namespace Logger {
     align?: 'left' | 'right'
   }
 
+  export interface Record {
+    id: number
+    name: string
+    type: Logger.Type
+    level: number
+    content: string
+    timestamp: number
+  }
+
   export interface Target {
     /**
      * - 0: no color support
@@ -43,7 +52,7 @@ namespace Logger {
     showTime?: string
     label?: LabelStyle
     maxLength?: number
-    write?(text: string, name: string, type: string, minLevel: number): void
+    record?(record: Record): void
     print?(text: string): void
   }
 }
@@ -60,6 +69,7 @@ class Logger {
   static readonly DEBUG = 3
 
   // global config
+  static id = 0
   static timestamp = 0
   static targets: Logger.Target[] = [{
     colors: stdout && stdout.level,
@@ -114,19 +124,27 @@ class Logger {
     this.warn(format, ...args)
   }
 
-  createMethod(type: Logger.Type, minLevel: number) {
+  createMethod(type: Logger.Type, level: number) {
     this[type] = (...args) => {
       if (args.length === 1 && isAggregateError(args[0])) {
         args[0].errors.forEach(error => this[type](error))
         return
       }
 
-      if (this.level < minLevel) return
-      const now = Date.now()
+      if (this.level < level) return
+      const id = ++Logger.id
+      const timestamp = Date.now()
       for (const target of Logger.targets) {
         const content = this.format(target, ...args)
-        if (target.write) {
-          target.write(content, this.name, type, minLevel)
+        if (target.record) {
+          target.record({
+            id,
+            type,
+            level,
+            content,
+            timestamp,
+            name: this.name,
+          })
           continue
         }
         const prefix = `[${type[0].toUpperCase()}]`
@@ -146,7 +164,7 @@ class Logger {
         }
         output += content.replace(/\n/g, '\n' + ' '.repeat(indent))
         if (target.showDiff) {
-          const diff = Logger.timestamp && now - Logger.timestamp
+          const diff = Logger.timestamp && timestamp - Logger.timestamp
           output += this.color(target, ' +' + Time.format(diff))
         }
         const { maxLength = 1024, print = console.log } = target
@@ -154,7 +172,7 @@ class Logger {
           return line.slice(0, maxLength) + (line.length > maxLength ? '...' : '')
         }).join('\n'))
       }
-      Logger.timestamp = now
+      Logger.timestamp = timestamp
     }
   }
 
