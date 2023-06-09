@@ -22,7 +22,7 @@ namespace Logger {
 
   export type Level = number | LevelConfig
   export type Function = (format: any, ...param: any[]) => void
-  export type Type = 'success' | 'error' | 'info' | 'warn' | 'warning' | 'debug'
+  export type Type = 'success' | 'error' | 'info' | 'warn' | 'debug'
   export type Formatter = (value: any, target: Logger.Target, logger: Logger) => any
 
   export interface LabelStyle {
@@ -43,7 +43,8 @@ namespace Logger {
     showTime?: string
     label?: LabelStyle
     maxLength?: number
-    print(text: string): void
+    write?(text: string, name: string, type: string, minLevel: number): void
+    print?(text: string): void
   }
 }
 
@@ -62,7 +63,7 @@ class Logger {
   static timestamp = 0
   static targets: Logger.Target[] = [{
     colors: stdout && stdout.level,
-    print(text: string) {
+    print(text) {
       console.log(text)
     },
   }]
@@ -90,7 +91,7 @@ class Logger {
       hash = ((hash << 3) - hash) + name.charCodeAt(i)
       hash |= 0
     }
-    const colors = target.colors! >= 2 ? c256 : target.colors! >= 1 ? c16 : []
+    const colors = !target.colors ? [] : target.colors >= 2 ? c256 : c16
     return colors[Math.abs(hash) % colors.length]
   }
 
@@ -98,28 +99,37 @@ class Logger {
     if (name in Logger.instances) return Logger.instances[name]
 
     Logger.instances[name] = this
-    this.createMethod('success', '[S]', Logger.SUCCESS)
-    this.createMethod('error', '[E]', Logger.ERROR)
-    this.createMethod('info', '[I]', Logger.INFO)
-    this.createMethod('warn', '[W]', Logger.WARN)
-    this.createMethod('warning', '[W]', Logger.WARN)
-    this.createMethod('debug', '[D]', Logger.DEBUG)
+    this.createMethod('success', Logger.SUCCESS)
+    this.createMethod('error', Logger.ERROR)
+    this.createMethod('info', Logger.INFO)
+    this.createMethod('warn', Logger.WARN)
+    this.createMethod('debug', Logger.DEBUG)
   }
 
   extend = (namespace: string) => {
     return new Logger(`${this.name}:${namespace}`)
   }
 
-  createMethod(name: Logger.Type, prefix: string, minLevel: number) {
-    this[name] = (...args) => {
+  warning = (format: any, ...args: any[]) => {
+    this.warn(format, ...args)
+  }
+
+  createMethod(type: Logger.Type, minLevel: number) {
+    this[type] = (...args) => {
       if (args.length === 1 && isAggregateError(args[0])) {
-        args[0].errors.forEach(error => this[name](error))
+        args[0].errors.forEach(error => this[type](error))
         return
       }
 
       if (this.level < minLevel) return
       const now = Date.now()
       for (const target of Logger.targets) {
+        const content = this.format(target, ...args)
+        if (target.write) {
+          target.write(content, this.name, type, minLevel)
+          continue
+        }
+        const prefix = `[${type[0].toUpperCase()}]`
         const space = ' '.repeat(target.label?.margin ?? 1)
         let indent = 3 + space.length, output = ''
         if (target.showTime) {
@@ -134,13 +144,13 @@ class Logger {
         } else {
           output += prefix + space + label.padEnd(padLength) + space
         }
-        output += this.format(target, indent, ...args)
+        output += content.replace(/\n/g, '\n' + ' '.repeat(indent))
         if (target.showDiff) {
           const diff = Logger.timestamp && now - Logger.timestamp
           output += this.color(target, ' +' + Time.format(diff))
         }
-        const { maxLength = 1024 } = target
-        target.print(output.split(/\r?\n/g).map(line => {
+        const { maxLength = 1024, print = console.log } = target
+        print(output.split(/\r?\n/g).map(line => {
           return line.slice(0, maxLength) + (line.length > maxLength ? '...' : '')
         }).join('\n'))
       }
@@ -153,7 +163,7 @@ class Logger {
     return Logger.color(target, code, value, decoration)
   }
 
-  private format(target: Logger.Target, indent: number, ...args: any[]) {
+  private format(target: Logger.Target, ...args: any[]) {
     if (args[0] instanceof Error) {
       args[0] = args[0].stack || args[0].message
       args.unshift('%s')
@@ -170,7 +180,7 @@ class Logger {
         return formatter(value, target, this)
       }
       return match
-    }).replace(/\n/g, '\n' + ' '.repeat(indent))
+    })
 
     for (const arg of args) {
       format += ' ' + Logger.formatters['o'](arg, target, this)
