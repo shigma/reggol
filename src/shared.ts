@@ -105,6 +105,31 @@ class Logger {
     return colors[Math.abs(hash) % colors.length]
   }
 
+  static render(target: Logger.Target, record: Logger.Record) {
+    const prefix = `[${record.type[0].toUpperCase()}]`
+    const space = ' '.repeat(target.label?.margin ?? 1)
+    let indent = 3 + space.length, output = ''
+    if (target.showTime) {
+      indent += target.showTime.length + space.length
+      output += Logger.color(target, 8, Time.template(target.showTime)) + space
+    }
+    const code = Logger.code(record.name, target)
+    const label = Logger.color(target, code, record.name, ';1')
+    const padLength = (target.label?.width ?? 0) + label.length - record.name.length
+    if (target.label?.align === 'right') {
+      output += label.padStart(padLength) + space + prefix + space
+      indent += (target.label.width ?? 0) + space.length
+    } else {
+      output += prefix + space + label.padEnd(padLength) + space
+    }
+    output += record.content.replace(/\n/g, '\n' + ' '.repeat(indent))
+    if (target.showDiff) {
+      const diff = Logger.timestamp && record.timestamp - Logger.timestamp
+      output += Logger.color(target, code, ' +' + Time.format(diff))
+    }
+    return output
+  }
+
   constructor(public name: string) {
     if (name in Logger.instances) return Logger.instances[name]
 
@@ -136,49 +161,16 @@ class Logger {
       const timestamp = Date.now()
       for (const target of Logger.targets) {
         const content = this.format(target, ...args)
+        const record: Logger.Record = { id, type, level, name: this.name, content, timestamp }
         if (target.record) {
-          target.record({
-            id,
-            type,
-            level,
-            content,
-            timestamp,
-            name: this.name,
-          })
-          continue
-        }
-        const prefix = `[${type[0].toUpperCase()}]`
-        const space = ' '.repeat(target.label?.margin ?? 1)
-        let indent = 3 + space.length, output = ''
-        if (target.showTime) {
-          indent += target.showTime.length + space.length
-          output += Logger.color(target, 8, Time.template(target.showTime)) + space
-        }
-        const label = this.color(target, this.name, ';1')
-        const padLength = (target.label?.width ?? 0) + label.length - this.name.length
-        if (target.label?.align === 'right') {
-          output += label.padStart(padLength) + space + prefix + space
-          indent += (target.label.width ?? 0) + space.length
+          target.record(record)
         } else {
-          output += prefix + space + label.padEnd(padLength) + space
+          const { print = console.log } = target
+          print(Logger.render(target, record))
         }
-        output += content.replace(/\n/g, '\n' + ' '.repeat(indent))
-        if (target.showDiff) {
-          const diff = Logger.timestamp && timestamp - Logger.timestamp
-          output += this.color(target, ' +' + Time.format(diff))
-        }
-        const { maxLength = 1024, print = console.log } = target
-        print(output.split(/\r?\n/g).map(line => {
-          return line.slice(0, maxLength) + (line.length > maxLength ? '...' : '')
-        }).join('\n'))
       }
       Logger.timestamp = timestamp
     }
-  }
-
-  private color(target: Logger.Target, value: any, decoration = '') {
-    const code = Logger.code(this.name, target)
-    return Logger.color(target, code, value, decoration)
   }
 
   private format(target: Logger.Target, ...args: any[]) {
@@ -204,7 +196,10 @@ class Logger {
       format += ' ' + Logger.formatters['o'](arg, target, this)
     }
 
-    return format
+    const { maxLength = 1024 } = target
+    return format.split(/\r?\n/g).map(line => {
+      return line.slice(0, maxLength) + (line.length > maxLength ? '...' : '')
+    }).join('\n')
   }
 
   get level() {
