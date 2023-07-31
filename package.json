@@ -3,11 +3,15 @@
   "description": "Logger for professionals",
   "version": "1.4.4",
   "sideEffects": false,
-  "main": "lib/node.js",
+  "main": "lib/node.cjs",
+  "module": "lib/node.mjs",
   "typings": "index.d.ts",
   "exports": {
     ".": {
-      "node": "./lib/node.js",
+      "node": {
+        "require": "./lib/node.cjs",
+        "import": "./lib/node.mjs"
+      },
       "browser": "./lib/browser.mjs"
     },
     "./shared": {
@@ -31,9 +35,10 @@
   "author": "Shigma <shigma10826@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build:node": "esbuild src/node.ts --outfile=lib/node.cjs --bundle --sourcemap --platform=node --external:cosmokit --external:supports-color --target=es2019",
+    "build:node:cjs": "esbuild src/node.ts --outfile=lib/node.cjs --bundle --sourcemap --platform=node --external:cosmokit --external:supports-color --target=es2019",
+    "build:node:mjs": "esbuild src/node.ts --outfile=lib/node.mjs --bundle --sourcemap --platform=node --external:cosmokit --external:supports-color --target=es2021 --format=esm",
     "build:browser": "esbuild src/browser.ts --outfile=lib/browser.mjs --bundle --sourcemap --platform=browser --external:cosmokit --external:supports-color --target=esnext",
-    "build": "yarn build:node && yarn build:browser && yarn tsc -b",
+    "build": "yarn build:node:cjs && yarn build:node:mjs && yarn build:browser && yarn tsc -b",
     "test": "mocha -r esbuild-register tests/*.spec.ts",
     "test:text": "shx rm -rf coverage && c8 -r text yarn test",
     "test:json": "shx rm -rf coverage && c8 -r json yarn test",
