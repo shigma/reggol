@@ -151,9 +151,13 @@ class Logger {
 
   createMethod(type: Logger.Type, level: number) {
     this[type] = (...args) => {
-      if (args.length === 1 && isAggregateError(args[0])) {
-        args[0].errors.forEach(error => this[type](error))
-        return
+      if (args.length === 1 && args[0] instanceof Error) {
+        if (args[0].cause) {
+          this[type](args[0].cause)
+        } else if (isAggregateError(args[0])) {
+          args[0].errors.forEach(error => this[type](error))
+          return
+        }
       }
 
       if (this.level < level) return
