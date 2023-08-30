@@ -196,8 +196,11 @@ class Logger {
       return match
     })
 
-    for (const arg of args) {
-      format += ' ' + Logger.formatters['o'](arg, target, this)
+    for (let arg of args) {
+      if (typeof arg === 'object' && arg) {
+        arg = Logger.formatters['o'](arg, target, this)
+      }
+      format += ' ' + arg
     }
 
     const { maxLength = 1024 } = target
