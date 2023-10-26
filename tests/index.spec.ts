@@ -30,7 +30,6 @@ describe('Logger API', () => {
   it('basic support', () => {
     logger = new Logger('test').extend('logger')
     expect(logger.name).to.equal('test:logger')
-    expect(logger).to.equal(new Logger('test:logger'))
     logger = new Logger('test')
   })
 

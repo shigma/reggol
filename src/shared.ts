@@ -81,7 +81,6 @@ class Logger {
 
   // global registry
   static formatters: Record<string, Logger.Formatter> = Object.create(null)
-  static instances: Record<string, Logger> = Object.create(null)
 
   static format(name: string, formatter: Logger.Formatter) {
     this.formatters[name] = formatter
@@ -132,9 +131,6 @@ class Logger {
   }
 
   constructor(public name: string, public meta?: any) {
-    if (name in Logger.instances) return Logger.instances[name]
-
-    Logger.instances[name] = this
     this.createMethod('success', Logger.SUCCESS)
     this.createMethod('error', Logger.ERROR)
     this.createMethod('info', Logger.INFO)
