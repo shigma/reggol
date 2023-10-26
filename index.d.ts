@@ -17,6 +17,7 @@ declare namespace Logger {
 
   export interface Record {
     id: number
+    meta: any
     name: string
     type: Logger.Type
     level: number
@@ -67,7 +68,7 @@ declare class Logger {
 
   private code: number
 
-  constructor(name: string)
+  constructor(name: string, meta?: any)
 
   extend(namespace: string): Logger
 }

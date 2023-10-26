@@ -33,6 +33,7 @@ namespace Logger {
 
   export interface Record {
     id: number
+    meta: any
     name: string
     type: Logger.Type
     level: number
@@ -130,7 +131,7 @@ class Logger {
     return output
   }
 
-  constructor(public name: string) {
+  constructor(public name: string, public meta?: any) {
     if (name in Logger.instances) return Logger.instances[name]
 
     Logger.instances[name] = this
@@ -165,7 +166,7 @@ class Logger {
       const timestamp = Date.now()
       for (const target of Logger.targets) {
         const content = this.format(target, ...args)
-        const record: Logger.Record = { id, type, level, name: this.name, content, timestamp }
+        const record: Logger.Record = { id, type, level, name: this.name, meta: this.meta, content, timestamp }
         if (target.record) {
           target.record(record)
         } else {
@@ -203,7 +204,7 @@ class Logger {
       format += ' ' + arg
     }
 
-    const { maxLength = 1024 } = target
+    const { maxLength = 10240 } = target
     return format.split(/\r?\n/g).map(line => {
       return line.slice(0, maxLength) + (line.length > maxLength ? '...' : '')
     }).join('\n')
