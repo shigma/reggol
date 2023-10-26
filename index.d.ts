@@ -38,6 +38,8 @@ declare namespace Logger {
     label?: LabelStyle
     record?(record: Record): void
     print?(text: string): void
+    levels?: LevelConfig
+    timestamp?: number
   }
 }
 
@@ -53,7 +55,6 @@ declare class Logger {
   static readonly DEBUG = 3
 
   // global config
-  static timestamp: number
   static colors: number[]
   static instances: Record<string, Logger>
   static targets: Logger.Target[]

@@ -55,6 +55,8 @@ namespace Logger {
     maxLength?: number
     record?(record: Record): void
     print?(text: string): void
+    levels?: Logger.LevelConfig
+    timestamp?: number
   }
 }
 
@@ -71,7 +73,6 @@ class Logger {
 
   // global config
   static id = 0
-  static timestamp = 0
   static targets: Logger.Target[] = [{
     colors: stdout && stdout.level,
     print(text) {
@@ -123,8 +124,8 @@ class Logger {
       output += prefix + space + label.padEnd(padLength) + space
     }
     output += record.content.replace(/\n/g, '\n' + ' '.repeat(indent))
-    if (target.showDiff) {
-      const diff = Logger.timestamp && record.timestamp - Logger.timestamp
+    if (target.showDiff && target.timestamp) {
+      const diff = record.timestamp - target.timestamp
       output += Logger.color(target, code, ' +' + Time.format(diff))
     }
     return output
@@ -157,10 +158,10 @@ class Logger {
         }
       }
 
-      if (this.level < level) return
       const id = ++Logger.id
       const timestamp = Date.now()
       for (const target of Logger.targets) {
+        if (this.getLevel(target) < level) continue
         const content = this.format(target, ...args)
         const record: Logger.Record = { id, type, level, name: this.name, meta: this.meta, content, timestamp }
         if (target.record) {
@@ -169,8 +170,8 @@ class Logger {
           const { print = console.log } = target
           print(Logger.render(target, record))
         }
+        target.timestamp = timestamp
       }
-      Logger.timestamp = timestamp
     }
   }
 
@@ -206,13 +207,17 @@ class Logger {
     }).join('\n')
   }
 
-  get level() {
+  getLevel(target?: Logger.Target) {
     const paths = this.name.split(':')
-    let config: Logger.Level = Logger.levels
+    let config: Logger.Level = target?.levels || Logger.levels
     do {
       config = config[paths.shift()!] ?? config['base']
     } while (paths.length && typeof config === 'object')
     return config as number
+  }
+
+  get level() {
+    return this.getLevel()
   }
 
   set level(value) {

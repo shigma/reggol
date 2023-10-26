@@ -2,7 +2,7 @@ import { install, InstalledClock } from '@sinonjs/fake-timers'
 import { expect } from 'chai'
 import Logger from '../src/node'
 
-describe('Logger API', () => {
+describe('Reggol', () => {
   let logger: Logger
   let data: string
   let clock: InstalledClock
