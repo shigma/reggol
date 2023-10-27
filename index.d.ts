@@ -62,7 +62,7 @@ declare class Logger {
   static formatters: Record<string, Logger.Formatter>
 
   static color(code: number, value: any, decoration?: string): string
-  static code(name: string): number
+  static code(name: string, target: Logger.Target): number
 
   public name: string
   public level: number

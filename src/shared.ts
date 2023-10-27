@@ -99,7 +99,7 @@ class Logger {
   static code(name: string, target: Logger.Target) {
     let hash = 0
     for (let i = 0; i < name.length; i++) {
-      hash = ((hash << 3) - hash) + name.charCodeAt(i)
+      hash = ((hash << 3) - hash) + name.charCodeAt(i) + 13
       hash |= 0
     }
     const colors = !target.colors ? [] : target.colors >= 2 ? c256 : c16
