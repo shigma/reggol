@@ -17,13 +17,15 @@ declare namespace Logger {
 
   export interface Record {
     id: number
-    meta: any
+    meta: Logger.Meta
     name: string
     type: Logger.Type
     level: number
     content: string
     timestamp: number
   }
+
+  export interface Meta {}
 
   export interface Target {
     /**

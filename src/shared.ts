@@ -140,7 +140,7 @@ class Logger {
   }
 
   extend = (namespace: string) => {
-    return new Logger(`${this.name}:${namespace}`)
+    return new Logger(`${this.name}:${namespace}`, this.meta)
   }
 
   warning = (format: any, ...args: any[]) => {
