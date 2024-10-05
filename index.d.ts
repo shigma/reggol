@@ -17,9 +17,9 @@ declare namespace Logger {
 
   export interface Record {
     id: number
-    meta: Logger.Meta
+    meta: Meta
     name: string
-    type: Logger.Type
+    type: Type
     level: number
     content: string
     timestamp: number

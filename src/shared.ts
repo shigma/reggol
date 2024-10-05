@@ -23,7 +23,7 @@ namespace Logger {
   export type Level = number | LevelConfig
   export type Function = (format: any, ...param: any[]) => void
   export type Type = 'success' | 'error' | 'info' | 'warn' | 'debug'
-  export type Formatter = (value: any, target: Logger.Target, logger: Logger) => any
+  export type Formatter = (value: any, target: Target, logger: Logger) => any
 
   export interface LabelStyle {
     width?: number
@@ -35,7 +35,7 @@ namespace Logger {
     id: number
     meta: any
     name: string
-    type: Logger.Type
+    type: Type
     level: number
     content: string
     timestamp: number
@@ -55,7 +55,7 @@ namespace Logger {
     maxLength?: number
     record?(record: Record): void
     print?(text: string): void
-    levels?: Logger.LevelConfig
+    levels?: LevelConfig
     timestamp?: number
   }
 }
