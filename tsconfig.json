@@ -2,9 +2,9 @@
   "compilerOptions": {
     "outDir": "lib",
     "rootDir": "src",
-    "target": "es2022",
-    "module": "commonjs",
-    "noEmit": true,
+    "target": "es2023",
+    "module": "esnext",
+    "emitDeclarationOnly": true,
     "composite": true,
     "incremental": true,
     "strict": true,

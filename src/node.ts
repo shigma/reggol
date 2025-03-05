@@ -1,8 +1,8 @@
 import { inspect } from 'util'
-import Logger from './shared'
+import { Factory } from './shared'
 
-Logger.format('o', (value, target) => {
-  return inspect(value, { colors: !!target.colors, depth: Infinity }).replace(/\s*\n\s*/g, ' ')
-})
+Factory.formatters['o'] = (value, target) => {
+  return inspect(value, { colors: !!target.colors, depth: Infinity, compact: true, breakLength: Infinity })
+}
 
-export = Logger
+export * from './shared'

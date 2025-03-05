@@ -3,23 +3,18 @@
   "description": "Logger for professionals",
   "version": "1.7.1",
   "sideEffects": false,
-  "main": "lib/node.js",
-  "types": "index.d.ts",
+  "type": "module",
   "exports": {
     ".": {
+      "types": "./shared.d.ts",
       "node": "./lib/node.js",
-      "browser": "./lib/browser.mjs",
-      "types": "./index.d.ts"
+      "default": "./lib/browser.js"
     },
-    "./shared": {
-      "require": "./lib/shared.js",
-      "import": "./lib/shared.mjs"
-    },
+    "./src/*": "./src/*",
     "./package.json": "./package.json"
   },
   "files": [
     "lib",
-    "src",
     "index.d.ts"
   ],
   "repository": {
@@ -58,8 +53,8 @@
     "typescript": "^5.5.3"
   },
   "dependencies": {
-    "cosmokit": "^1.6.3",
-    "object-inspect": "^1.13.1",
-    "supports-color": "^8.1.1"
+    "cosmokit": "^1.7.2",
+    "object-inspect": "^1.13.4",
+    "supports-color": "^10.0.0"
   }
 }
