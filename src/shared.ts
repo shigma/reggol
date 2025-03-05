@@ -86,9 +86,9 @@ export class Logger {
         }
       }
 
-      const sn = ++this._factory.sn
+      const sn = ++this._factory._snMessage
       const ts = Date.now()
-      for (const exporter of this._factory.exporters) {
+      for (const exporter of this._factory.exporters.values()) {
         const targetLevel = exporter.levels?.[this.name] ?? exporter.levels?.default ?? Level.INFO
         if (targetLevel < level) continue
         const body = this._format(exporter, args)
@@ -140,16 +140,19 @@ export class Factory {
     },
   }
 
-  sn = 0
-  exporters: Exporter[] = []
+  _snMessage = 0
+  _snExporter = 0
+
+  exporters = new Map<number, Exporter>()
   formatters = Object.create(Factory.formatters)
 
-  logger(name: string, meta: any = {}) {
+  createLogger(name: string, meta: any = {}) {
     return new Logger(name, meta, this)
   }
 
-  exporter(exporter: Exporter) {
-    this.exporters.push(exporter)
+  addExporter(exporter: Exporter) {
+    this.exporters.set(++this._snExporter, exporter)
+    return () => this.exporters.delete(this._snExporter)
   }
 }
 
