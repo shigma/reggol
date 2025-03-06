@@ -45,13 +45,13 @@ export class Logger {
     return `\u001b[3${code < 8 ? code : '8;5;' + code}${exporter.colors >= 2 ? decoration : ''}m${value}\u001b[0m`
   }
 
-  static code(name: string, exporter: Exporter) {
+  static code(name: string, level?: false | ColorSupportLevel) {
     let hash = 0
     for (let i = 0; i < name.length; i++) {
       hash = ((hash << 3) - hash) + name.charCodeAt(i) + 13
       hash |= 0
     }
-    const colors = !exporter.colors ? [] : exporter.colors >= 2 ? c256 : c16
+    const colors = !level ? [] : level >= 2 ? c256 : c16
     return colors[Math.abs(hash) % colors.length]
   }
 
@@ -124,7 +124,7 @@ export class Factory {
     s: (value) => value,
     j: (value) => JSON.stringify(value),
     c: (value, exporter, logger) => {
-      return Logger.color(exporter, Logger.code(logger.name, exporter), value)
+      return Logger.color(exporter, Logger.code(logger.name, exporter.colors), value)
     },
   }
 
@@ -179,7 +179,7 @@ export namespace Exporter {
         indent += this.showTime.length
         output += Logger.color(this, 8, Time.template(this.showTime))
       }
-      const code = Logger.code(message.name, this)
+      const code = Logger.code(message.name, this.colors)
       const label = Logger.color(this, code, message.name, ';1')
       const padLength = (this.label?.width ?? 0) + label.length - message.name.length
       if (this.label?.align === 'right') {
