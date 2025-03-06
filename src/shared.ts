@@ -79,7 +79,7 @@ export class Logger {
       for (const exporter of this._factory.exporters.values()) {
         const targetLevel = exporter.levels?.[this.name] ?? exporter.levels?.default ?? Level.INFO
         if (targetLevel < level) continue
-        const body = this._format(exporter, args)
+        const body = this._format(exporter, args.slice())
         const message: Message = { ...this._meta, sn, ts, type, level, name: this.name, body }
         exporter.export(message)
       }
