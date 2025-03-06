@@ -28,18 +28,6 @@ export interface Message {
   body: string
 }
 
-export interface Exporter extends Exporter.Options {
-  export(message: Message): void
-}
-
-export namespace Exporter {
-  export interface Options {
-    colors?: false | ColorSupportLevel
-    maxLength?: number
-    levels?: Record<string, number>
-  }
-}
-
 export interface Logger extends Record<Type, Method> {}
 
 export const enum Level {
@@ -156,60 +144,72 @@ export class Factory {
   }
 }
 
-export interface ConsoleExporter extends ConsoleExporter.Options {}
-
-export class ConsoleExporter implements Exporter {
-  constructor(options?: ConsoleExporter.Options) {
-    Object.assign(this, {
-      colors: supportsColor.stdout ? supportsColor.stdout.level : 0,
-      showTime: 'yyyy-MM-dd hh:mm:ss',
-      showDiff: false,
-      ...options,
-    })
-  }
-
-  export(message: Message) {
-    console.log(this.render(message))
-  }
-
-  render(message: Message) {
-    const prefix = `[${message.type[0].toUpperCase()}]`
-    const space = ' '.repeat(this.label?.margin ?? 1)
-    let indent = 3 + space.length, output = ''
-    if (this.showTime) {
-      indent += this.showTime.length + space.length
-      output += Logger.color(this, 8, Time.template(this.showTime)) + space
-    }
-    const code = Logger.code(message.name, this)
-    const label = Logger.color(this, code, message.name, ';1')
-    const padLength = (this.label?.width ?? 0) + label.length - message.name.length
-    if (this.label?.align === 'right') {
-      output += label.padStart(padLength) + space + prefix + space
-      indent += (this.label.width ?? 0) + space.length
-    } else {
-      output += prefix + space + label.padEnd(padLength) + space
-    }
-    output += message.body.replace(/\n/g, '\n' + ' '.repeat(indent))
-    if (this.showDiff && this.timestamp) {
-      const diff = message.ts - this.timestamp
-      output += Logger.color(this, code, ' +' + Time.format(diff))
-    }
-    this.timestamp = message.ts
-    return output
-  }
+export interface Exporter extends Exporter.Options {
+  export(message: Message): void
 }
 
-export namespace ConsoleExporter {
-  export interface Options extends Exporter.Options {
-    showDiff?: boolean
-    showTime?: string
-    label?: LabelStyle
-    timestamp?: number
+export namespace Exporter {
+  export interface Options {
+    colors?: false | ColorSupportLevel
+    maxLength?: number
+    levels?: Record<string, number>
   }
 
-  export interface LabelStyle {
-    width?: number
-    margin?: number
-    align?: 'left' | 'right'
+  export interface Console extends Console.Options {}
+
+  export class Console implements Exporter {
+    constructor(options?: Console.Options) {
+      Object.assign(this, {
+        colors: supportsColor.stdout ? supportsColor.stdout.level : 0,
+        showTime: 'yyyy-MM-dd hh:mm:ss ',
+        showDiff: false,
+        ...options,
+      })
+    }
+
+    export(message: Message) {
+      console.log(this.render(message))
+    }
+
+    render(message: Message) {
+      const prefix = `[${message.type[0].toUpperCase()}]`
+      const space = ' '.repeat(this.label?.margin ?? 1)
+      let indent = 3 + space.length, output = ''
+      if (this.showTime) {
+        indent += this.showTime.length
+        output += Logger.color(this, 8, Time.template(this.showTime))
+      }
+      const code = Logger.code(message.name, this)
+      const label = Logger.color(this, code, message.name, ';1')
+      const padLength = (this.label?.width ?? 0) + label.length - message.name.length
+      if (this.label?.align === 'right') {
+        output += label.padStart(padLength) + space + prefix + space
+        indent += (this.label.width ?? 0) + space.length
+      } else {
+        output += prefix + space + label.padEnd(padLength) + space
+      }
+      output += message.body.replace(/\n/g, '\n' + ' '.repeat(indent))
+      if (this.showDiff && this.timestamp) {
+        const diff = message.ts - this.timestamp
+        output += Logger.color(this, code, ' +' + Time.format(diff))
+      }
+      this.timestamp = message.ts
+      return output
+    }
+  }
+
+  export namespace Console {
+    export interface Options extends Exporter.Options {
+      showDiff?: boolean
+      showTime?: string
+      label?: LabelStyle
+      timestamp?: number
+    }
+
+    export interface LabelStyle {
+      width?: number
+      margin?: number
+      align?: 'left' | 'right'
+    }
   }
 }
