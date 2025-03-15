@@ -1,12 +1,14 @@
 {
   "name": "reggol",
   "description": "Logger for professionals",
-  "version": "2.0.3",
+  "version": "2.1.0",
   "sideEffects": false,
   "type": "module",
+  "main": "lib/node.js",
+  "types": "lib/shared.d.ts",
   "exports": {
     ".": {
-      "types": "./shared.d.ts",
+      "types": "./lib/shared.d.ts",
       "node": "./lib/node.js",
       "default": "./lib/browser.js"
     },
@@ -52,7 +54,7 @@
     "typescript": "^5.5.3"
   },
   "dependencies": {
-    "cosmokit": "^1.7.2",
+    "cosmokit": "^1.7.3",
     "object-inspect": "^1.13.4",
     "supports-color": "^10.0.0"
   }

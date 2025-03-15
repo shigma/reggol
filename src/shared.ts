@@ -39,6 +39,16 @@ export const enum Level {
   DEBUG = 3,
 }
 
+export namespace Logger {
+  export interface Options {
+    name: string
+    meta?: Partial<Message>
+    level?: Level
+  }
+}
+
+export interface Logger extends Logger.Options {}
+
 export class Logger {
   static color(exporter: Exporter, code: number, value: any, decoration = '') {
     if (!exporter.colors) return '' + value
@@ -55,7 +65,8 @@ export class Logger {
     return colors[Math.abs(hash) % colors.length]
   }
 
-  constructor(public name: string, private _meta: any, private _factory: Factory) {
+  constructor(options: Logger.Options, private factory: Factory) {
+    Object.assign(this, options)
     this.success = this._method('success', Level.SUCCESS)
     this.error = this._method('error', Level.ERROR)
     this.info = this._method('info', Level.INFO)
@@ -74,13 +85,13 @@ export class Logger {
         }
       }
 
-      const sn = ++this._factory._snMessage
+      const sn = ++this.factory._snMessage
       const ts = Date.now()
-      for (const exporter of this._factory.exporters.values()) {
-        const targetLevel = exporter.levels?.[this.name] ?? exporter.levels?.default ?? Level.INFO
+      for (const exporter of this.factory.exporters.values()) {
+        const targetLevel = exporter.levels?.[this.name] ?? exporter.levels?.default ?? this.level ?? Level.INFO
         if (targetLevel < level) continue
         const body = this._format(exporter, args.slice())
-        const message: Message = { ...this._meta, sn, ts, type, level, name: this.name, body }
+        const message: Message = { sn, ts, type, level, name: this.name, ...this.meta, body }
         exporter.export(message)
       }
     }
@@ -97,7 +108,7 @@ export class Logger {
     let format: string = args.shift()
     format = format.replace(/%([a-zA-Z%])/g, (match, char) => {
       if (match === '%%') return '%'
-      const formatter = this._factory.formatters[char]
+      const formatter = this.factory.formatters[char]
       if (typeof formatter === 'function') {
         const value = args.shift()
         return formatter(value, exporter, this)
@@ -107,7 +118,7 @@ export class Logger {
 
     for (let arg of args) {
       if (typeof arg === 'object' && arg) {
-        arg = this._factory.formatters['o'](arg, exporter, this)
+        arg = this.factory.formatters['o'](arg, exporter, this)
       }
       format += ' ' + arg
     }
@@ -134,8 +145,8 @@ export class Factory {
   exporters = new Map<number, Exporter>()
   formatters = Object.create(Factory.formatters)
 
-  createLogger(name: string, meta: any = {}) {
-    return new Logger(name, meta, this)
+  createLogger(name: string, options: Omit<Logger.Options, 'name'> = {}) {
+    return new Logger({ name, ...options }, this)
   }
 
   addExporter(exporter: Exporter) {
