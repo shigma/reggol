@@ -184,7 +184,8 @@ export namespace Exporter {
 
     render(message: Message) {
       const prefix = `[${message.type[0].toUpperCase()}]`
-      const space = ' '.repeat(this.label?.margin ?? 1)
+      const margin = this.label?.margin ?? 1
+      const space = ' '.repeat(margin)
       let indent = 3 + space.length, output = ''
       if (this.showTime) {
         indent += this.showTime.length
@@ -194,7 +195,7 @@ export namespace Exporter {
       const label = Logger.color(this, code, message.name, ';1')
       const padLength = (this.label?.width ?? 0) + label.length - message.name.length
       if (this.label?.align === 'right') {
-        output += label.padStart(padLength) + space + prefix + space
+        output += space + label.padStart(padLength - margin) + space + prefix + space
         indent += (this.label.width ?? 0) + space.length
       } else {
         output += prefix + space + label.padEnd(padLength) + space
