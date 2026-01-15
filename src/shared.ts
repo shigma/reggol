@@ -133,6 +133,7 @@ export class Logger {
 export class Factory {
   static formatters: Record<string, Formatter> = {
     s: (value) => value,
+    d: (value, exporter) => Logger.color(exporter, 3, value),
     j: (value) => JSON.stringify(value),
     c: (value, exporter, logger) => {
       return Logger.color(exporter, Logger.code(logger.name, exporter.colors), value)
